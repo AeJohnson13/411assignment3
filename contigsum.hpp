@@ -7,55 +7,70 @@
 #ifndef FILE_CONTIGSUM_HPP_INCLUDED
 #define FILE_CONTIGSUM_HPP_INCLUDED
 
-#include <iterator>
 #include <algorithm>
-using std::max;
+//for std::max
 #include <vector>
-using std::vector;
-#include <iostream>
-using std::cout;
-using std::endl;
+// for std::max({})
+#include <array>
+// for std::array
 
+// contigSumRecur
+// given a sequence of integers returns an array containing: 
+// [0] A. The GCS of the sequence.
+// [1] B. The greatest possible sum of a contiguous subsequence that includes the first value in the sequence, or zero if all such sums are negative.
+// [2] C. The greatest possible sum of a contiguous subsequence that includes the last value in the sequence, or zero if all such sums are negative.
+// [3] D. The sum of the entire sequence.
 
 template <typename RAIter>
-vector<int> contigSumRecur( RAIter first, RAIter last){
+std::array<int, 4> contigSumRecur(RAIter first, RAIter last)
+{
     auto length = last - first;
     // Base Case
-    
-    if(length == 1){
-        return {*first, *first, *first, *first};
-   
+    if (length == 1)
+    {
+        auto val = *first;
+        if (val > 0)
+            return {val, val, val, val};
+        else
+            return {val, 0, 0, val};
     }
     // Recursive Case
-    else{
-        auto middle = first + length/2;
+    else
+    {
+        auto middle = first + length / 2;
+
         auto left = contigSumRecur(first, middle);
-        auto right = contigSumRecur(middle, last); 
+        auto right = contigSumRecur(middle, last);
 
+        // maximum subarray
+        int A =std::max({left[0], right[0], (left[2] + right[1])});
 
-        //maximum subarray 
-        int a = max({left[0],right[0],(left[2]+right[1])});
-        //maximum left aligned array
-        int b = max({left[1],left[3]+right[1]});
-        //maximum right aligned array
-        int c = max({right[2],right[3]+left[2]});
-        //total sum
-        int d = left[3] + right[3];
-        
-        return {a, b, c, d};
+        // maximum left aligned array
+        int B =std::max({left[1], left[3] + right[1], 0});
+
+        // maximum right aligned array
+        int C =std::max({right[2], right[3] + left[2], 0});
+
+        // total sum
+        int D = left[3] + right[3];
+
+        return {A, B, C, D};
     }
 }
 
+
+// ContigSum
+// wrapper function for contigSumRecur
+// returns maximum contiguous sum
+// of a given sequence
 template <typename RAIter>
 int contigSum(RAIter first, RAIter last)
 {
-    if(first == last)
+    if (first == last)
         return 0;
-    
+
     auto result = contigSumRecur(first, last);
-    return max(0, result[0]);
+    return std::max(0, result[0]);
 }
-
-
 
 #endif // #ifndef FILE_CONTIGSUM_HPP_INCLUDED
