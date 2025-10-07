@@ -41,16 +41,19 @@ size_t stableCount(FDIter first, FDIter middle, FDIter last)
     auto in1 = first;          // Read location in 1st half
     auto in2 = middle;         // Read location in 2nd half
     auto out = begin(buffer);  // Write location in buffer
-
+    auto dist = distance(in1, in2);
     // Merge two sorted lists into a single list in buff.
     while (in1 != middle && in2 != last)
     {
         if (*in2 < *in1){  // Must do comparison this way, to be stable.
-            swaps += distance(in1, in2);
+            swaps += dist;
+            //cout << *in2 << "is less than " << *in1;
+            //cout << "move" << dist << endl;
             *out++ = std::move(*in2++);
         }
         else{
             *out++ = std::move(*in1++);
+            dist--;
         }
     }
 
@@ -65,7 +68,6 @@ size_t stableCount(FDIter first, FDIter middle, FDIter last)
 
     // Move buffer contents back to original sequence location.
     move(begin(buffer), end(buffer), first);
-    cout << swaps << endl;
     return swaps;
 }
 
